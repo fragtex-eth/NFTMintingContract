@@ -32,7 +32,7 @@ contract PabloNFT is ERC721, Ownable {
      * @param _paymentToken The address of the ERC20 token to use for payments.
      * @param _fee The fee required for minting a token.
      */
-    constructor(address _paymentToken, uint256 _fee) ERC721("MyToken", "MTK") {
+    constructor(address _paymentToken, uint256 _fee) ERC721("Pablo", "PABLO") {
         paymentToken = IERC20(_paymentToken);
         fee = _fee;
         _numAvailableTokens = maxNfts;
@@ -40,7 +40,7 @@ contract PabloNFT is ERC721, Ownable {
 
     /// @dev Returns the base URI for token metadata.
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://bafybeigwu25an0/";
+        return "ipfs://bafybeierwegrqruvlmr7dnpjwxtn5b3oczmf7gwq22wa45y6owjm44kzmu/";
     }
 
     /**

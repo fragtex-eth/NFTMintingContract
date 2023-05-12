@@ -18,7 +18,9 @@ function createIndividualJsonFiles(data) {
   data.forEach((item, index) => {
     // Modify the image property to include the item name in the URL
     item.image =
-      "ipfs://bafybeifc2qhk6khmzyixif3jwu7v7ucgc5esx4erdoqy7a4j3iaswbz2oa" + "/" + item.name.replace(/ /g, "") + ".png";
+      "ipfs://bafybeifvzbtx6qdmsfnd4pttbxtfj6vo4uepwmnjjpxpq4kirk3rw6xxcq/" +
+      item.name.replace(/ /g, "").replace(/#/g, "") +
+      ".png";
 
     // Create a new JSON file with the item data in the output folder
     fs.writeFileSync(
