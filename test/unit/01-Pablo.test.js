@@ -125,6 +125,66 @@ let credit = async function (to, amount) {
               "Already minted"
             );
           });
+          it("should revert after 25 nfts are minted", async function () {
+            for(var i = 0; i< MaxNfts; i++){
+              //Set Up
+              let newWallet = ethers.Wallet.createRandom();
+              newWallet = newWallet.connect(ethers.provider);
+              await deployer.sendTransaction({
+                to: newWallet.address,
+                value: ethers.utils.parseEther("1"),
+              });
+  
+              await ercContract.transfer(newWallet.address, fee);
+              ercContractNew = ercContract.connect(newWallet);
+              tokenContractNew = tokenContract.connect(newWallet);
+              await ercContractNew.approve(tokenContract.address, fee);
+              await ercContract.transfer(ercContractNew.address, 100000);
+              await tokenContract.addToWhitelist([newWallet.address]);
+
+              await expect(tokenContractNew.mint()).to.not.be.reverted;
+
+            }
+            let newWallet = ethers.Wallet.createRandom();
+            newWallet = newWallet.connect(ethers.provider);
+            await deployer.sendTransaction({
+              to: newWallet.address,
+              value: ethers.utils.parseEther("1"),
+            });
+
+            await ercContract.transfer(newWallet.address, fee);
+            ercContractNew = ercContract.connect(newWallet);
+            tokenContractNew = tokenContract.connect(newWallet);
+            await ercContractNew.approve(tokenContract.address, fee);
+            await ercContract.transfer(ercContractNew.address, 100000);
+            await tokenContract.addToWhitelist([newWallet.address]);
+
+            await expect(tokenContractNew.mint()).to.be.revertedWith(
+              "All NFTs already minted"
+            );
+          });
+        });
+        describe("Withdraw()", function () {
+          beforeEach(async () => {
+            await tokenContract.addToWhitelist([alice.address, charles.address]);
+            //Set Allowances
+            ercContract = await ethers.getContract("MockToken");
+            ercContractAlice = ercContract.connect(alice);
+            await ercContractAlice.approve(tokenContract.address, 10000000000);
+            await ercContract.transfer(alice.address, 100000);
+            await tokenContractAlice.mint();
+          });
+          it("non owner should not be able to withdraw", async function () {
+            await expect(tokenContractAlice.withdraw()).to.be.revertedWith(
+              "Ownable: caller is not the owner"
+            );
+          });
+          it("owner should have the right amount after withdrawal", async function () {
+            let balance1 = await ercContract.balanceOf(deployer.address);
+            await tokenContract.withdraw();
+            let balance2 = await ercContract.balanceOf(deployer.address);
+            expect(balance2.sub(balance1)).is.equal(fee);
+          });
         });
       });
     });

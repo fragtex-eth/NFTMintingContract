@@ -74,6 +74,4 @@ contract PabloNFT is ERC721, Ownable {
         uint256 balance = paymentToken.balanceOf(address(this));
         paymentToken.safeTransfer(owner(), balance);
     }
-
-    function reveal() external onlyOwner {}
 }
