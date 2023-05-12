@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract MyToken is ERC721, Ownable {
+contract PabloNFT is ERC721, Ownable {
     using Counters for Counters.Counter;
     using SafeERC20 for IERC20;
 
@@ -18,6 +18,7 @@ contract MyToken is ERC721, Ownable {
 
     IERC20 public immutable paymentToken;
     uint256 public immutable fee;
+    uint256 public constant maxNfts = 25;
 
     event AddedToWhitelist(address[] addresses);
     event RemovedFromWhitelist(address[] addresses);
@@ -34,10 +35,12 @@ contract MyToken is ERC721, Ownable {
     function safeMint(address to) public {
         require(whitelist[msg.sender], "Address not in whitelist");
         require(!minted[msg.sender], "Already minted");
+        uint256 tokenId = _tokenIdCounter.current();
+        require(tokenId < maxNfts, "All NFTs already minted");
+        _tokenIdCounter.increment();
         paymentToken.safeTransferFrom(msg.sender, address(this), fee);
         minted[msg.sender] = true;
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+        
 
         _safeMint(to, tokenId);
     }

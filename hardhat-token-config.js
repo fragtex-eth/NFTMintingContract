@@ -1,8 +1,8 @@
 const tokenConfig = {
-  name: "Encircled",
-  symbol: "ENCD",
-  initialSupply: ethers.utils.parseUnits("200000000", 18),
-  decimals: 18,
+  name: "MyToken",
+  symbol: "MTK",
+  initialSupply: 25,
+  fee: 5
 };
 
 module.exports = {
