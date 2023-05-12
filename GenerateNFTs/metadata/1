@@ -1,0 +1,11 @@
+{
+  "name": "PABLO #2",
+  "description": "Pablo In Holding",
+  "image": "ipfs://bafybeifc2qhk6khmzyixif3jwu7v7ucgc5esx4erdoqy7a4j3iaswbz2oa/1.png",
+  "attributes": [
+    {
+      "trait_type": "Pepe",
+      "value": "1"
+    }
+  ]
+}
