@@ -32,15 +32,19 @@ contract PabloNFT is ERC721, Ownable {
         return "ipfs://bafybeigwu25an0/";
     }
 
-    function safeMint(address to) public {
+    function mint() public {
         require(whitelist[msg.sender], "Address not in whitelist");
         require(!minted[msg.sender], "Already minted");
+        minted[msg.sender] = true;
+        _safeMint(msg.sender);
+    }
+
+    function _safeMint(address to) internal {
         uint256 tokenId = _tokenIdCounter.current();
         require(tokenId < maxNfts, "All NFTs already minted");
         _tokenIdCounter.increment();
         paymentToken.safeTransferFrom(msg.sender, address(this), fee);
-        minted[msg.sender] = true;
-        
+   
 
         _safeMint(to, tokenId);
     }
@@ -70,4 +74,6 @@ contract PabloNFT is ERC721, Ownable {
         uint256 balance = paymentToken.balanceOf(address(this));
         paymentToken.safeTransfer(owner(), balance);
     }
+
+    function reveal() external onlyOwner {}
 }

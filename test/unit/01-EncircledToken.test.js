@@ -9,7 +9,7 @@ const fee = tokenConfig.fee;
 const MaxNfts = tokenConfig.initialSupply;
 
 let credit = async function (to, amount) {
-  return await tokenContract.transfer(to.address, amount);
+  return await ercContract.transfer(to.address, amount);
 };
 
 !developmentChains.includes(network.name)
@@ -36,6 +36,94 @@ let credit = async function (to, amount) {
           });
           it("should have the symbol " + symbol, async function () {
             expect(await tokenContract.symbol()).to.equal(symbol);
+          });
+          it("should have the fee " + fee, async function () {
+            expect(await tokenContract.fee()).to.equal(5);
+          });
+        });
+        describe("Whitelist()", function () {
+          it("Non owner should not be able to call the function", async function () {
+            await expect(
+              tokenContractAlice.addToWhitelist([alice.address])
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+            await expect(
+              tokenContractAlice.removeFromWhitelist([alice.address])
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+          });
+          it("Owner should able to call the function", async function () {
+            await expect(tokenContract.addToWhitelist([alice.address])).to.not
+              .be.reverted;
+            await expect(tokenContract.removeFromWhitelist([alice.address])).to
+              .not.be.reverted;
+          });
+          it("Owner can add remove whitelist multiple addresses and addresses are whitlisted after calling", async function () {
+            expect(
+              await tokenContract.addToWhitelist([
+                alice.address,
+                bob.address,
+                charles.address,
+              ])
+            ).to.not.be.reverted;
+            expect(await tokenContract.whitelist(alice.address)).to.equal(true);
+            expect(await tokenContract.whitelist(accounts[5].address)).to.equal(
+              false
+            );
+            expect(await tokenContract.whitelist(bob.address)).to.equal(true);
+            expect(await tokenContract.whitelist(charles.address)).to.equal(
+              true
+            );
+            expect(await tokenContract.whitelist(alice.address)).to.equal(true);
+            expect(
+              await tokenContract.removeFromWhitelist([
+                alice.address,
+                charles.address,
+              ])
+            ).to.not.be.reverted;
+            expect(await tokenContract.whitelist(accounts[5].address)).to.equal(
+              false
+            );
+            expect(await tokenContract.whitelist(bob.address)).to.equal(true);
+            expect(await tokenContract.whitelist(charles.address)).to.equal(
+              false
+            );
+            expect(await tokenContract.whitelist(alice.address)).to.equal(
+              false
+            );
+          });
+        });
+        describe("Mint()", function () {
+          beforeEach(async () => {
+            await tokenContract.addToWhitelist([
+              alice.address,
+              charles.address,
+            ]);
+            //Set Allowances
+            ercContract = await ethers.getContract("MockToken");
+            ercContractAlice = ercContract.connect(alice);
+            await ercContractAlice.approve(
+              tokenContract.address,
+              10000000000
+            );
+            await ercContract.transfer(alice.address, 100000);
+          });
+          it("should return when address is not whitelisted ", async function () {
+            await expect(tokenContractBob.mint()).to.be.revertedWith(
+              "Address not in whitelist"
+            );
+          });
+          it("should return when allowance is not set ", async function () {
+            await expect(tokenContractCharles.mint()).to.be.revertedWith(
+              "ERC20: insufficient allowance"
+            );
+          });
+          it("should work when allowance is set ", async function () {
+            await expect(tokenContractAlice.mint()).to.not.be.reverted;
+          });
+          it("should return when try to mint twice ", async function () {
+            await expect(tokenContractAlice.mint()).to.not.be.reverted;
+            await expect(tokenContractAlice.mint()).to.be.revertedWith(
+              "Already minted"
+            );
           });
         });
       });
