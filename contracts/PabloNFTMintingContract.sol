@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 /**
  * @title PabloNFT
  */
-contract PabloNFT is ERC721, Ownable {
+contract NFTContract is ERC721, Ownable {
     using SafeERC20 for IERC20;
 
     // Declare state variables for whitelist, minted status, and available tokens
@@ -40,7 +40,7 @@ contract PabloNFT is ERC721, Ownable {
 
     /// @dev Returns the base URI for token metadata.
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://bafybeierwegrqruvlmr7dnpjwxtn5b3oczmf7gwq22wa45y6owjm44kzmu/";
+        return "ipfs://..../";
     }
 
     /**
